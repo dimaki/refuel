@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>de.dimaki</groupId>
+    <artifactId>refuel</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>Refuel.fx</name>
+    
+    <url>https://github.com/dimaki/refuel.fx</url>
+    <description>An application update tool for Java 8</description>
+    <organization>
+        <name>Dino Tsoumakis</name>
+        <url>http://dimaki.de</url>
+    </organization>
+    <inceptionYear>2014</inceptionYear>
+    
+    <properties>
+        <maven.min.version>3.0.5</maven.min.version>
+        <java.min.version>1.8</java.min.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Dino Tsoumakis</name>
+            <organization>dimaki.de</organization>
+            <organizationUrl>http://dimaki.de</organizationUrl>
+        </developer>
+        <developer>
+            <name>Jens Deters</name>
+            <organization>jensd.de</organization>
+            <organizationUrl>http://jensd.de</organizationUrl>
+        </developer>
+    </developers>
+    <prerequisites>
+        <maven>${maven.min.version}</maven>
+    </prerequisites>
+            
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.3.1</version>
+                <configuration>
+                    <rules>
+                        <requireMavenVersion>
+                            <message>Maven version ${maven.min.version} or later is required.</message>
+                            <version>${maven.min.version}</version>
+                        </requireMavenVersion>
+                        <requireJavaVersion>
+                            <message>JDK version ${java.min.version} or later is required.</message>
+                            <version>${java.min.version}</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
