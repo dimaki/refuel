@@ -20,6 +20,7 @@
         <java.min.version>1.8</java.min.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <version.jersey>2.13</version.jersey>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -47,6 +48,17 @@
     </prerequisites>
             
     <dependencies>
+        <dependency>        
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${version.jersey}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>osgi-resource-locator</artifactId>
+                    <groupId>org.glassfish.hk2</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
