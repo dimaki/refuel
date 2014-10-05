@@ -18,7 +18,7 @@ package de.dimaki.refuel.updater.boundary;
 import de.dimaki.refuel.appcast.boundary.AppcastManager;
 import de.dimaki.refuel.appcast.control.AppcastException;
 import de.dimaki.refuel.appcast.entity.Appcast;
-import de.dimaki.refuel.updater.control.ApplicationStatus;
+import de.dimaki.refuel.updater.entity.ApplicationStatus;
 import de.dimaki.refuel.updater.control.VersionComparator;
 import de.dimaki.refuel.updater.control.ZipHandler;
 import java.nio.file.Path;

@@ -21,7 +21,7 @@ import de.dimaki.refuel.appcast.entity.Appcast;
 import de.dimaki.refuel.appcast.entity.Channel;
 import de.dimaki.refuel.appcast.entity.Enclosure;
 import de.dimaki.refuel.appcast.entity.Item;
-import de.dimaki.refuel.updater.control.ApplicationStatus;
+import de.dimaki.refuel.updater.entity.ApplicationStatus;
 
 /**
  *

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.dimaki.refuel.updater.control;
+package de.dimaki.refuel.updater.entity;
 
 import de.dimaki.refuel.appcast.entity.Appcast;
 import java.util.Date;
