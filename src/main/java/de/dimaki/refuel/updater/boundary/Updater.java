@@ -21,19 +21,29 @@ import de.dimaki.refuel.appcast.entity.Appcast;
 import de.dimaki.refuel.updater.entity.ApplicationStatus;
 import de.dimaki.refuel.updater.control.VersionComparator;
 import de.dimaki.refuel.updater.control.ZipHandler;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 /**
  *
  * @author Dino Tsoumakis
  */
 public class Updater {
-
     private static final Logger logger = Logger.getLogger(Updater.class.getName());
+    private static final String UPDATE_SCRIPT_SUFFIX = "-update.js";
 
     AppcastManager appcastManager;
 
@@ -121,7 +131,44 @@ public class Updater {
         files = ZipHandler.unzip(downloaded, targetDir, true);
         logger.log(Level.FINE, "Extracted files: {0}", files);
 
+        // Check if there is an update script available and execute it if so
+        Map<String, Object> bindings = new HashMap<>();
+        bindings.put("targetDir", targetDir);
+        for (Path filePath : files) {
+            if (filePath.getFileName().toString().endsWith(UPDATE_SCRIPT_SUFFIX)) {
+                executeUpdateScript(filePath, bindings);
+            }
+        }
+
         return files;
+    }
+
+    protected void executeUpdateScript(Path filePath, Map<String, Object> bindings) {
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+        // Fallback
+        if (engine == null) {
+            engine = new ScriptEngineManager().getEngineByExtension("js");
+        }
+        if (engine != null) {
+            logger.log(Level.INFO, "Executing update script ''{0}''...", filePath);
+            Bindings b = engine.createBindings();
+            b.putAll(bindings);
+            engine.setBindings(b, ScriptContext.ENGINE_SCOPE);
+
+            FileReader fr = null;
+            try {
+                fr = new FileReader(filePath.toFile());
+                engine.eval(fr);
+            } catch (FileNotFoundException | ScriptException ex) {
+                logger.log(Level.SEVERE, "Could not evaluate update script file ''{0}''! {1}", new Object[]{filePath, ex});
+            } finally {
+                try {
+                    if (fr != null) {
+                        fr.close();
+                    }
+                } catch (IOException ex) { /* ignore */ }
+            }
+        }
     }
 
 }
