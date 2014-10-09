@@ -15,9 +15,6 @@
  */
 package de.dimaki.refuel.appcast.boundary;
 
-import de.dimaki.refuel.appcast.control.AppcastException;
-import de.dimaki.refuel.appcast.entity.Appcast;
-import de.dimaki.refuel.appcast.entity.Enclosure;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,8 +32,11 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import org.apache.commons.io.FilenameUtils;
 import org.glassfish.jersey.client.ClientConfig;
+import de.dimaki.refuel.appcast.control.AppcastException;
+import de.dimaki.refuel.appcast.entity.Appcast;
+import de.dimaki.refuel.appcast.entity.Enclosure;
+import java.nio.file.Paths;
 
 /**
  *
@@ -108,8 +108,7 @@ public class AppcastManager {
             String url = enclosure.getUrl();
             if (url != null && !url.isEmpty()) {
                 URL enclosureUrl = new URL(url);
-//                String targetName = Paths.get(enclosureUrl.toURI()).normalize().getFileName().toString();
-                String targetName = FilenameUtils.getName(enclosureUrl.toString());
+                String targetName = Paths.get(enclosureUrl.toURI()).normalize().getFileName().toString();
                 long length = enclosure.getLength();
 
                 File tmpFile = null;
