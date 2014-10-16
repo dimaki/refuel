@@ -24,6 +24,7 @@ import de.dimaki.refuel.appcast.entity.Appcast;
 import de.dimaki.refuel.appcast.entity.Channel;
 import de.dimaki.refuel.appcast.entity.Enclosure;
 import de.dimaki.refuel.appcast.entity.Item;
+import java.io.FileNotFoundException;
 
 /**
  *
@@ -122,7 +123,35 @@ public class AppcastManagerTest {
             } catch (IOException iOException) {
             }
         }
+    }
 
+    @Test
+    public void testDownloadHttpUrl() {
+        Appcast appcast = getAppcast();
+        appcast.getChannel().getItems().get(0).getEnclosure().setUrl("http://dimaki.de/test/jartest.zip");
+        Path createdTempDirectory = null;
+        try {
+            createdTempDirectory = Files.createTempDirectory("ac-");
+        } catch (IOException ex) {
+            fail(ex.toString());
+        }
+        Path downloaded = null;
+        try {
+            downloaded = manager.download(appcast, createdTempDirectory);
+        } catch (FileNotFoundException fnfe) {
+            /* That is ok here. We only want to check the URL parsing part */
+        } catch (Exception ex) {
+            fail(ex.toString());
+        } finally {
+            try {
+                Files.deleteIfExists(downloaded);
+            } catch (Exception exception) {
+            }
+            try {
+                Files.deleteIfExists(createdTempDirectory);
+            } catch (IOException iOException) {
+            }
+        }
     }
 
     public Appcast getAppcast() {

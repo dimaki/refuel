@@ -35,7 +35,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import org.apache.commons.io.FilenameUtils;
 import org.glassfish.jersey.client.ClientConfig;
 
 /**
@@ -108,7 +107,7 @@ public class AppcastManager {
             String url = enclosure.getUrl();
             if (url != null && !url.isEmpty()) {
                 URL enclosureUrl = new URL(url);
-                String targetName = FilenameUtils.getName(enclosureUrl.toString());
+                String targetName = url.substring( url.lastIndexOf('/')+1, url.length() );
                 long length = enclosure.getLength();
 
                 File tmpFile = null;
