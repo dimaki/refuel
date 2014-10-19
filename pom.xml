@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.dimaki</groupId>
     <artifactId>refuel</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Refuel</name>
     
@@ -20,7 +20,6 @@
         <java.min.version>1.8</java.min.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <version.jersey>2.13</version.jersey>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -48,17 +47,6 @@
     </prerequisites>
             
     <dependencies>
-        <dependency>        
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${version.jersey}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>osgi-resource-locator</artifactId>
-                    <groupId>org.glassfish.hk2</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -68,7 +56,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <version>1.10.8</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

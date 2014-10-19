@@ -29,13 +29,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import org.glassfish.jersey.client.ClientConfig;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 /**
  *
@@ -47,11 +43,12 @@ public class AppcastManager {
     public static final String MANIFEST_APPCAST_VERSION = "Appcast-Version";
     public static final String MANIFEST_APPCAST_URL = "Appcast-Url";
 
-    Client client;
+    //Client client;
+    Unmarshaller unmarshaller;
 
-    public AppcastManager() {
-        // Try to read username and password for authentication
-        client = ClientBuilder.newClient(new ClientConfig());
+    public AppcastManager() throws JAXBException {
+        JAXBContext jc = JAXBContext.newInstance(Appcast.class);
+        unmarshaller = jc.createUnmarshaller();
     }
 
     /**
@@ -61,19 +58,16 @@ public class AppcastManager {
      * @return
      * @throws AppcastException
      */
-    public Appcast fetch(String url) throws AppcastException {
-        WebTarget appcastResource = client.target(url);
-        Response response = appcastResource.request(MediaType.APPLICATION_XML_TYPE).get(Response.class);
-        if (response == null) {
-            logger.log(Level.SEVERE, "Could not fetch appcast from URL ''{0}''", url);
-            throw new AppcastException("Could not fetch appcast from URL", url, 500, null);
-        }
-        if (response.getStatus() != Status.OK.getStatusCode()) {
-            logger.log(Level.SEVERE, "Could not fetch appcast from URL ''{0}'': {1} {2}", new Object[]{url, response.getStatus(), response.getStatusInfo()});
-            throw new AppcastException("Could not fetch appcast from URL", url, response.getStatus(), response.getStatusInfo().getReasonPhrase());
+    public Appcast fetch(final URL url) throws AppcastException {
+        Appcast appcast = null;
+        try {
+            appcast = (Appcast)unmarshaller.unmarshal(url);
+        } catch (JAXBException jbe) {
+            logger.log(Level.SEVERE, "Could not read appcast from URL ''{0}''", url);
+            throw new AppcastException("Could not read appcast from URL", url, 404, jbe.getCause().toString());
         }
         // Got a valid response
-        return response.readEntity(Appcast.class);
+        return appcast;
     }
 
     /**
@@ -83,7 +77,7 @@ public class AppcastManager {
      * @return The version string
      * @throws AppcastException in case of an error
      */
-    public String getLatestVersion(String url) throws AppcastException {
+    public String getLatestVersion(final URL url) throws AppcastException {
         String version = null;
         Appcast appcast = fetch(url);
         if (appcast != null) {

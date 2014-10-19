@@ -15,24 +15,26 @@
  */
 package de.dimaki.refuel.appcast.control;
 
+import java.net.URL;
+
 /**
  *
  * @author Dino Tsoumakis
  */
 public class AppcastException extends Exception {
 
-    String url;
+    URL url;
     int status;
     String statusInfo;
 
-    public AppcastException(String message, String url, int status, String statusInfo) {
+    public AppcastException(String message, URL url, int status, String statusInfo) {
         super(message);
         this.url = url;
         this.status = status;
         this.statusInfo = statusInfo;
     }
 
-    public String getUrl() {
+    public URL getUrl() {
         return url;
     }
 

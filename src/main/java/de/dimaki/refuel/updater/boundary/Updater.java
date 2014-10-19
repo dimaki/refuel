@@ -24,6 +24,7 @@ import de.dimaki.refuel.updater.control.ZipHandler;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.xml.bind.JAXBException;
 
 /**
  *
@@ -48,7 +50,11 @@ public class Updater {
     AppcastManager appcastManager;
 
     public Updater() {
-        appcastManager = new AppcastManager();
+        try {
+            appcastManager = new AppcastManager();
+        } catch (JAXBException ex) {
+            throw new RuntimeException("Could not initialize Appcast Manager!", ex);
+        }
     }
 
     /**
@@ -58,11 +64,11 @@ public class Updater {
      * @param updateUrl The update URL (Appcast URL)
      * @return The application status or 'null' if the status could not be evaluated
      */
-    public ApplicationStatus getApplicationStatus(String localVersion, String updateUrl) {
+    public ApplicationStatus getApplicationStatus(String localVersion, final URL updateUrl) {
         ApplicationStatus status = ApplicationStatus.UNKNOWN;
         if (localVersion != null) {
             if (!localVersion.isEmpty()) {
-                if (updateUrl != null && !updateUrl.isEmpty()) {
+                if (updateUrl != null) {
                     // Fetch remote version
                     String remoteVersion = null;
                     try {

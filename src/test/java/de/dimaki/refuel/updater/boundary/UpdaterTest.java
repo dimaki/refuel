@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import de.dimaki.refuel.appcast.boundary.AppcastManager;
@@ -22,6 +21,8 @@ import de.dimaki.refuel.appcast.entity.Channel;
 import de.dimaki.refuel.appcast.entity.Enclosure;
 import de.dimaki.refuel.appcast.entity.Item;
 import de.dimaki.refuel.updater.entity.ApplicationStatus;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  *
@@ -46,26 +47,30 @@ public class UpdaterTest {
         c.setItems(items);
         appcast.setChannel(c);
 
-        when(appcastManagerMock.fetch(anyString())).thenReturn(appcast);
-        when(appcastManagerMock.getLatestVersion(anyString())).thenReturn("2.0.4711");
+        when(appcastManagerMock.fetch(any(URL.class))).thenReturn(appcast);
+        when(appcastManagerMock.getLatestVersion(any(URL.class))).thenReturn("2.0.4711");
         when(appcastManagerMock.download(any(Appcast.class), any(Path.class))).thenCallRealMethod();
         updater.appcastManager = appcastManagerMock;
     }
 
     @Test
     public void testGetApplicationStatus() {
-        ApplicationStatus applicationStatus = updater.getApplicationStatus("2.0.1044", "TESTURL");
+        try {
+        ApplicationStatus applicationStatus = updater.getApplicationStatus("2.0.1044", new URL("http://TESTURL"));
         assertEquals(ApplicationStatus.UPDATE_AVAILABLE, applicationStatus);
         assertEquals("2.0.4711", applicationStatus.getInfo());
         assertNotNull(applicationStatus.getUpdateTime());
 
-        applicationStatus = updater.getApplicationStatus("2.0.4711", "TESTURL");
+        applicationStatus = updater.getApplicationStatus("2.0.4711", new URL("http://TESTURL"));
         assertEquals(ApplicationStatus.OK, applicationStatus);
         assertNotNull(applicationStatus.getUpdateTime());
 
-        applicationStatus = updater.getApplicationStatus("2.2.4711", "TESTURL");
+        applicationStatus = updater.getApplicationStatus("2.2.4711", new URL("http://TESTURL"));
         assertEquals(ApplicationStatus.UNKNOWN, applicationStatus);
         assertNotNull(applicationStatus.getUpdateTime());
+        } catch (MalformedURLException mue) {
+            fail(mue.toString());
+        }
     }
 
     @Test

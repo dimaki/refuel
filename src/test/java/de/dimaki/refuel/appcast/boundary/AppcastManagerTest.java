@@ -4,11 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import static org.junit.Assert.assertEquals;
@@ -16,15 +11,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import de.dimaki.refuel.appcast.control.AppcastException;
 import de.dimaki.refuel.appcast.entity.Appcast;
 import de.dimaki.refuel.appcast.entity.Channel;
 import de.dimaki.refuel.appcast.entity.Enclosure;
 import de.dimaki.refuel.appcast.entity.Item;
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import javax.xml.bind.JAXBException;
+import org.junit.Ignore;
 
 /**
  *
@@ -32,7 +28,11 @@ import java.io.FileNotFoundException;
  */
 public class AppcastManagerTest {
 
-    AppcastManager manager = new AppcastManager();
+    AppcastManager manager;
+
+    public AppcastManagerTest() throws JAXBException {
+        this.manager = new AppcastManager();
+    }
 
     @Test
     public void testFetch() {
@@ -66,7 +66,7 @@ public class AppcastManagerTest {
     @Test
     public void testFetchNoConnection() {
         try {
-            manager.fetch("http://thisisanotexistingdomainnamethatproducesanerror.com/error");
+            manager.fetch(new URL("http://thisisanotexistingdomainnamethatproducesanerror.com/error"));
         } catch (AppcastException ex) {
             if (ex.getStatus() != 404) {
                 fail(ex.toString());
@@ -78,22 +78,25 @@ public class AppcastManagerTest {
 
     @Test
     public void testFetchError() {
-        Client clientMock = mock(Client.class);
-        WebTarget targetMock = mock (WebTarget.class);
-        Invocation.Builder b = mock(Invocation.Builder.class);
-        when(b.get(any(Class.class))).thenReturn(Response.status(404).build());
-        when(targetMock.request(any(MediaType.class))).thenReturn(b);
-        when(clientMock.target(any(String.class))).thenReturn(targetMock);
-        manager.client = clientMock;
         try {
-
-            manager.fetch("http://dummy.com");
+            manager.fetch(new URL("http://dummy.com"));
         } catch (AppcastException ex) {
             // OK
         } catch (Exception e) {
             fail(e.toString());
         }
+    }
 
+    @Test
+    @Ignore
+    public void testFetchRealHTTP() {
+        Appcast appcast = null;
+        try {
+            appcast = manager.fetch(new URL("http://example.com/test/appcast.xml"));
+        } catch (AppcastException | MalformedURLException ex) {
+            fail(ex.toString());
+        }
+        assertNotNull(appcast);
     }
 
     @Test
