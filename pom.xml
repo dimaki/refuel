@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.dimaki</groupId>
     <artifactId>refuel</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2</version>
     <packaging>jar</packaging>
-    <name>Refuel</name>
     
+    <name>Refuel</name>
     <url>https://github.com/dimaki/refuel</url>
     <description>An application update tool for Java 8</description>
     <organization>
@@ -25,21 +25,36 @@
 
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
+            <name>Apache License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
+    <scm>
+        <connection>scm:git:https://dimaki@github.com/dimaki/refuel.git</connection>
+        <developerConnection>scm:git:https://dimaki@github.com/dimaki/refuel.git</developerConnection>
+        <url>https://github.com/dimaki/refuel</url>
+        <tag>HEAD</tag>
+    </scm>
     <developers>
         <developer>
+            <id>dimaki</id>
             <name>Dino Tsoumakis</name>
             <organization>dimaki.de</organization>
             <organizationUrl>http://dimaki.de</organizationUrl>
+            <roles>
+                <role>Architect</role>
+                <role>Developer</role>
+            </roles>
         </developer>
         <developer>
+            <id>jensd</id>
             <name>Jens Deters</name>
             <organization>jensd.de</organization>
             <organizationUrl>http://jensd.de</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
         </developer>
     </developers>
     <prerequisites>
@@ -60,6 +75,56 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    <profiles>
+        <profile> 
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.4</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     
     <build>
         <plugins>
@@ -97,4 +162,15 @@
             </plugin>
         </plugins>
     </build>
+    
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 </project>
