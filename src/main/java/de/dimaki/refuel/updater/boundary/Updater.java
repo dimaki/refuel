@@ -114,10 +114,10 @@ public class Updater {
     /**
      * Update with the given appcast information in the specified targetDir
      *
-     * @param appcast
-     * @param targetDir
+     * @param appcast The appcast content (containing the file to download)
+     * @param targetDir The target directory for downloaded update files
      * @return Updated files
-     * @throws Exception
+     * @throws Exception in case of an error
      */
     public Set<Path> update(Appcast appcast, Path targetDir) throws Exception {
         Set<Path> files;

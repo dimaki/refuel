@@ -54,9 +54,9 @@ public class AppcastManager {
     /**
      * Fetch an appcast from the given URL
      *
-     * @param url
-     * @return
-     * @throws AppcastException
+     * @param url The update URL
+     * @return The fetched appcast content
+     * @throws AppcastException in case of an error
      */
     public Appcast fetch(final URL url) throws AppcastException {
         Appcast appcast = null;
@@ -89,10 +89,10 @@ public class AppcastManager {
     /**
      * Download the file from the given URL to the specified target
      *
-     * @param appcast
-     * @param targetDir
-     * @return
-     * @throws IOException
+     * @param appcast The appcast content
+     * @param targetDir The target download dir (update directory)
+     * @return Path to the downloaded update file
+     * @throws IOException in case of an error
      */
     public Path download(Appcast appcast, Path targetDir) throws IOException, Exception {
         Path downloaded = null;
