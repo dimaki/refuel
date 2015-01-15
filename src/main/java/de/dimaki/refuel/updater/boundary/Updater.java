@@ -66,7 +66,7 @@ public class Updater {
      * @return The application status or 'null' if the status could not be evaluated
      */
     public ApplicationStatus getApplicationStatus(String localVersion, final URL updateUrl) {
-        return getApplicationStatus(localVersion, updateUrl, Proxy.NO_PROXY, AppcastManager.DEFAULT_CONNECT_TIMEOUT, AppcastManager.DEFAULT_READ_TIMEOUT);
+        return getApplicationStatus(localVersion, updateUrl, null, AppcastManager.DEFAULT_CONNECT_TIMEOUT, AppcastManager.DEFAULT_READ_TIMEOUT);
     }
 
     /**
