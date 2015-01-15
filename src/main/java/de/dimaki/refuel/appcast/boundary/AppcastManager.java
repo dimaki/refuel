@@ -65,7 +65,7 @@ public class AppcastManager {
      * @throws AppcastException in case of an error
      */
     public Appcast fetch(final URL url) throws AppcastException {
-        return fetch(url, Proxy.NO_PROXY, DEFAULT_READ_TIMEOUT, DEFAULT_READ_TIMEOUT);
+        return fetch(url, null, DEFAULT_READ_TIMEOUT, DEFAULT_READ_TIMEOUT);
     }
 
     /**
@@ -82,7 +82,11 @@ public class AppcastManager {
         Appcast appcast = null;
         URLConnection conn = null;
         try {
-            conn = url.openConnection(proxy);
+            if (proxy == null) {
+                conn = url.openConnection();
+            } else {
+                conn = url.openConnection(proxy);
+            }
             conn.setConnectTimeout(connectTimeout);
             conn.setReadTimeout(readTimeout);
             conn.connect();
@@ -112,7 +116,7 @@ public class AppcastManager {
      * @throws AppcastException in case of an error
      */
     public String getLatestVersion(final URL url) throws AppcastException {
-        return getLatestVersion(url, Proxy.NO_PROXY, DEFAULT_READ_TIMEOUT, DEFAULT_READ_TIMEOUT);
+        return getLatestVersion(url, null, DEFAULT_READ_TIMEOUT, DEFAULT_READ_TIMEOUT);
     }
 
     /**
