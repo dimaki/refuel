@@ -24,6 +24,7 @@ import de.dimaki.refuel.updater.control.ZipHandler;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.Proxy;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Date;
@@ -65,6 +66,20 @@ public class Updater {
      * @return The application status or 'null' if the status could not be evaluated
      */
     public ApplicationStatus getApplicationStatus(String localVersion, final URL updateUrl) {
+        return getApplicationStatus(localVersion, updateUrl, Proxy.NO_PROXY, AppcastManager.DEFAULT_CONNECT_TIMEOUT, AppcastManager.DEFAULT_READ_TIMEOUT);
+    }
+
+    /**
+     * Get the update status of the application specified.
+     *
+     * @param localVersion The local version string, e.g. "2.0.1344"
+     * @param updateUrl The update URL (Appcast URL)
+     * @param proxy Proxy data
+     * @param connectTimeout The connect timeout in milliseconds
+     * @param readTimeout The read timeout in milliseconds
+     * @return The application status or 'null' if the status could not be evaluated
+     */
+    public ApplicationStatus getApplicationStatus(String localVersion, final URL updateUrl, Proxy proxy, int connectTimeout, int readTimeout) {
         ApplicationStatus status = ApplicationStatus.UNKNOWN;
         if (localVersion != null) {
             if (!localVersion.isEmpty()) {
@@ -73,7 +88,7 @@ public class Updater {
                     String remoteVersion = null;
                     try {
                         logger.log(Level.FINE, "Fetching appcast from update URL ''{0}''...", updateUrl);
-                        Appcast appcast = appcastManager.fetch(updateUrl);
+                        Appcast appcast = appcastManager.fetch(updateUrl, proxy, connectTimeout, readTimeout);
                         if (appcast != null) {
                             remoteVersion = appcast.getLatestVersion();
                         }

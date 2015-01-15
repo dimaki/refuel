@@ -18,6 +18,7 @@ import de.dimaki.refuel.appcast.entity.Enclosure;
 import de.dimaki.refuel.appcast.entity.Item;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import javax.xml.bind.JAXBException;
 import org.junit.Ignore;
@@ -66,12 +67,16 @@ public class AppcastManagerTest {
     @Test
     public void testFetchNoConnection() {
         try {
-            manager.fetch(new URL("http://thisisanotexistingdomainnamethatproducesanerror.com/error"));
+            manager.fetch(new URL("http://thisisanotexistingdomainnamethatproducesanerror.com/error"),
+                    Proxy.NO_PROXY,
+                    AppcastManager.DEFAULT_CONNECT_TIMEOUT,
+                    AppcastManager.DEFAULT_READ_TIMEOUT);
         } catch (AppcastException ex) {
             if (ex.getStatus() != 404) {
                 fail(ex.toString());
             }
         } catch (Exception e) {
+            System.out.println("Exception was: " + e.toString());
             // OK
         }
     }
@@ -79,7 +84,10 @@ public class AppcastManagerTest {
     @Test
     public void testFetchError() {
         try {
-            manager.fetch(new URL("http://dummy.com"));
+            manager.fetch(new URL("http://dummy.com"),
+                    Proxy.NO_PROXY,
+                    AppcastManager.DEFAULT_CONNECT_TIMEOUT,
+                    AppcastManager.DEFAULT_READ_TIMEOUT);
         } catch (AppcastException ex) {
             // OK
         } catch (Exception e) {
@@ -92,7 +100,10 @@ public class AppcastManagerTest {
     public void testFetchRealHTTP() {
         Appcast appcast = null;
         try {
-            appcast = manager.fetch(new URL("http://example.com/test/appcast.xml"));
+            appcast = manager.fetch(new URL("http://example.com/test/appcast.xml"),
+                    Proxy.NO_PROXY,
+                    AppcastManager.DEFAULT_CONNECT_TIMEOUT,
+                    AppcastManager.DEFAULT_READ_TIMEOUT);
         } catch (AppcastException | MalformedURLException ex) {
             fail(ex.toString());
         }

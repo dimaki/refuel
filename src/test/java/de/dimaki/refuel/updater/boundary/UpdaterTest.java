@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import de.dimaki.refuel.appcast.boundary.AppcastManager;
@@ -22,6 +23,7 @@ import de.dimaki.refuel.appcast.entity.Enclosure;
 import de.dimaki.refuel.appcast.entity.Item;
 import de.dimaki.refuel.updater.entity.ApplicationStatus;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 
 /**
@@ -47,8 +49,8 @@ public class UpdaterTest {
         c.setItems(items);
         appcast.setChannel(c);
 
-        when(appcastManagerMock.fetch(any(URL.class))).thenReturn(appcast);
-        when(appcastManagerMock.getLatestVersion(any(URL.class))).thenReturn("2.0.4711");
+        when(appcastManagerMock.fetch(any(URL.class), any(Proxy.class), anyInt(), anyInt())).thenReturn(appcast);
+        when(appcastManagerMock.getLatestVersion(any(URL.class), any(Proxy.class), anyInt(), anyInt())).thenReturn("2.0.4711");
         when(appcastManagerMock.download(any(Appcast.class), any(Path.class))).thenCallRealMethod();
         updater.appcastManager = appcastManagerMock;
     }

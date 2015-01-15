@@ -21,7 +21,11 @@ import de.dimaki.refuel.appcast.entity.Enclosure;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.Proxy;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -42,6 +46,8 @@ public class AppcastManager {
     private static final Logger logger = Logger.getLogger(AppcastManager.class.getName());
     public static final String MANIFEST_APPCAST_VERSION = "Appcast-Version";
     public static final String MANIFEST_APPCAST_URL = "Appcast-Url";
+    public static final int DEFAULT_CONNECT_TIMEOUT = 8000;
+    public static final int DEFAULT_READ_TIMEOUT = 8000;
 
     //Client client;
     Unmarshaller unmarshaller;
@@ -59,12 +65,40 @@ public class AppcastManager {
      * @throws AppcastException in case of an error
      */
     public Appcast fetch(final URL url) throws AppcastException {
+        return fetch(url, Proxy.NO_PROXY, DEFAULT_READ_TIMEOUT, DEFAULT_READ_TIMEOUT);
+    }
+
+    /**
+     * Fetch an appcast from the given URL
+     *
+     * @param url The update URL
+     * @param proxy proxy data
+     * @param connectTimeout the connect timeout in milliseconds
+     * @param readTimeout the read timeout in milliseconds
+     * @return The fetched appcast content
+     * @throws AppcastException in case of an error
+     */
+    public Appcast fetch(final URL url, Proxy proxy, int connectTimeout, int readTimeout) throws AppcastException {
         Appcast appcast = null;
+        URLConnection conn = null;
         try {
-            appcast = (Appcast)unmarshaller.unmarshal(url);
+            conn = url.openConnection(proxy);
+            conn.setConnectTimeout(connectTimeout);
+            conn.setReadTimeout(readTimeout);
+            conn.connect();
+            appcast = (Appcast)unmarshaller.unmarshal(conn.getInputStream());
         } catch (JAXBException jbe) {
-            logger.log(Level.SEVERE, "Could not read appcast from URL ''{0}''", url);
+            logger.log(Level.SEVERE, "Could not read appcast from URL ''{0}'':" + jbe, url);
             throw new AppcastException("Could not read appcast from URL", url, 404, jbe.getCause().toString());
+        } catch (SocketTimeoutException ste) {
+            logger.log(Level.SEVERE, "Timout reading appcast from URL ''{0}'':" + ste, url);
+            throw new AppcastException("Timeout reading appcast from URL", url, 408, ste.getCause().toString());
+        } catch (UnknownHostException uhe) {
+            logger.log(Level.SEVERE, "Unknown Host ''{0}'': " + uhe, url);
+            throw new AppcastException("Unknown Host", url, 404, uhe.toString());
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Could not establish connection to URL ''{0}'': " + ex, url);
+            throw new AppcastException("Could not establish connection to URL", url, 403, ex.getMessage());
         }
         // Got a valid response
         return appcast;
@@ -78,8 +112,22 @@ public class AppcastManager {
      * @throws AppcastException in case of an error
      */
     public String getLatestVersion(final URL url) throws AppcastException {
+        return getLatestVersion(url, Proxy.NO_PROXY, DEFAULT_READ_TIMEOUT, DEFAULT_READ_TIMEOUT);
+    }
+
+    /**
+     * Get the latest appcast version string from the given url
+     *
+     * @param url The appcast url
+     * @param proxy proxy data
+     * @param connectTimeout the connect timeout in milliseconds
+     * @param readTimeout the read timeout in milliseconds
+     * @return The version string
+     * @throws AppcastException in case of an error
+     */
+    public String getLatestVersion(final URL url, Proxy proxy, int connectTimeout, int readTimeout) throws AppcastException {
         String version = null;
-        Appcast appcast = fetch(url);
+        Appcast appcast = fetch(url, proxy, connectTimeout, readTimeout);
         if (appcast != null) {
             version = appcast.getLatestVersion();
         }
