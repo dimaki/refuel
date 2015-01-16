@@ -17,5 +17,6 @@ refuel is available from maven central:
 
 Usage
 ```java
+Updater updater = new Updater();
 ApplicationStatus status = updater.getApplicationStatus(localVersion, updateUrl);
 ```
