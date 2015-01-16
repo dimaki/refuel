@@ -14,3 +14,8 @@ refuel is available from maven central:
             <version>[LATEST_RELEASE]</version>
         </dependency>
 ```
+
+Usage
+```java
+ApplicationStatus status = updater.getApplicationStatus(localVersion, updateUrl);
+```
