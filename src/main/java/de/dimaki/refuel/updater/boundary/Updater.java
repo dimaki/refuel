@@ -31,21 +31,21 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.xml.bind.JAXBException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Dino Tsoumakis
  */
 public class Updater {
-    private static final Logger logger = Logger.getLogger(Updater.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Updater.class);
     private static final String UPDATE_SCRIPT_SUFFIX = "-update.js";
 
     AppcastManager appcastManager;
@@ -87,7 +87,7 @@ public class Updater {
                     // Fetch remote version
                     String remoteVersion = null;
                     try {
-                        logger.log(Level.FINE, "Fetching appcast from update URL ''{0}''...", updateUrl);
+                        LOG.debug("Fetching appcast from update URL ''{}''...", updateUrl);
                         Appcast appcast = appcastManager.fetch(updateUrl, proxy, connectTimeout, readTimeout);
                         if (appcast != null) {
                             remoteVersion = appcast.getLatestVersion();
@@ -107,13 +107,13 @@ public class Updater {
                             }
                         }
                     } catch (AppcastException aex) {
-                        logger.log(Level.WARNING, "{0} ''{1}'': {2} {3}", new Object[]{aex.getMessage(), aex.getUrl(), aex.getStatus(), aex.getStatusInfo()});
+                        LOG.warn("{} ''{}'': {} {}", aex.getMessage(), aex.getUrl(), aex.getStatus(), aex.getStatusInfo());
                         status = ApplicationStatus.FAILURE;
                         status.setInfo(aex.getMessage() + " '" + aex.getUrl() + "': " + aex.getStatus() + " " + aex.getStatusInfo());
                     } catch (Exception ex) {
                         // Seems the be a network problem (e.g. no internet connection)
                         // Just log it, status should be unknown
-                        logger.log(Level.WARNING, "Could not connect to update server: {0}", ex.toString());
+                        LOG.warn("Could not connect to update server: {}", ex.toString());
                     }
                     status.setUpdateTime(new Date());
                 }
@@ -139,18 +139,18 @@ public class Updater {
         if (appcast == null) {
             throw new IllegalArgumentException("Appcast cannot be null!");
         }
-        logger.log(Level.FINE, "Updating application ''{0}''...", appcast.getTitle());
+        LOG.debug("Updating application ''{}''...", appcast.getTitle());
 
         // Download the update and verfiy it
         Path downloaded = appcastManager.download(appcast, targetDir);
         if (downloaded == null) {
             throw new Exception("Could not download update package for application '" + appcast.getTitle() + "'!");
         }
-        logger.log(Level.FINE, "Downloaded update package ''{0}''", downloaded);
+        LOG.debug("Downloaded update package ''{}''", downloaded);
 
         // Unzip the update if required
         files = ZipHandler.unzip(downloaded, targetDir, true);
-        logger.log(Level.FINE, "Extracted files: {0}", files);
+        LOG.debug("Extracted files: {}", files);
 
         // Check if there is an update script available and execute it if so
         Map<String, Object> bindings = new HashMap<>();
@@ -171,7 +171,7 @@ public class Updater {
             engine = new ScriptEngineManager().getEngineByExtension("js");
         }
         if (engine != null) {
-            logger.log(Level.INFO, "Executing update script ''{0}''...", filePath);
+            LOG.info("Executing update script ''{}''...", filePath);
             Bindings b = engine.createBindings();
             b.putAll(bindings);
             engine.setBindings(b, ScriptContext.ENGINE_SCOPE);
@@ -181,7 +181,7 @@ public class Updater {
                 fr = new FileReader(filePath.toFile());
                 engine.eval(fr);
             } catch (FileNotFoundException | ScriptException ex) {
-                logger.log(Level.SEVERE, "Could not evaluate update script file ''{0}''! {1}", new Object[]{filePath, ex});
+                LOG.error("Could not evaluate update script file ''{}''!", filePath, ex);
             } finally {
                 try {
                     if (fr != null) {

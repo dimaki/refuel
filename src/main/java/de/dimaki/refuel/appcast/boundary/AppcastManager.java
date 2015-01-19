@@ -31,8 +31,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -42,8 +40,6 @@ import javax.xml.bind.Unmarshaller;
  * @author Dino Tsoumakis
  */
 public class AppcastManager {
-
-    private static final Logger logger = Logger.getLogger(AppcastManager.class.getName());
     public static final String MANIFEST_APPCAST_VERSION = "Appcast-Version";
     public static final String MANIFEST_APPCAST_URL = "Appcast-Url";
     public static final int DEFAULT_CONNECT_TIMEOUT = 8000;
@@ -92,16 +88,12 @@ public class AppcastManager {
             conn.connect();
             appcast = (Appcast)unmarshaller.unmarshal(conn.getInputStream());
         } catch (JAXBException jbe) {
-            logger.log(Level.SEVERE, "Could not read appcast from URL ''{0}'':" + jbe, url);
             throw new AppcastException("Could not read appcast from URL", url, 404, jbe.getCause().toString());
         } catch (SocketTimeoutException ste) {
-            logger.log(Level.SEVERE, "Timout reading appcast from URL ''{0}'':" + ste, url);
             throw new AppcastException("Timeout reading appcast from URL", url, 408, ste.getCause().toString());
         } catch (UnknownHostException uhe) {
-            logger.log(Level.SEVERE, "Unknown Host ''{0}'': " + uhe, url);
             throw new AppcastException("Unknown Host", url, 404, uhe.toString());
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, "Could not establish connection to URL ''{0}'': " + ex, url);
             throw new AppcastException("Could not establish connection to URL", url, 403, ex.getMessage());
         }
         // Got a valid response

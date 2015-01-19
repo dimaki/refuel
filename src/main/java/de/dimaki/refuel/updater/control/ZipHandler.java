@@ -27,8 +27,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -36,16 +36,16 @@ import java.util.logging.Logger;
  */
 public class ZipHandler {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ZipHandler.class);
+    private static final String ROOT_PATH = "/";
+    private static final String ZIP_EXTENSION = ".zip";
+
     /**
      * Hide constructor
      */
     private ZipHandler() {
         super();
     }
-
-    private static final Logger logger = Logger.getLogger(ZipHandler.class.getName());
-    private static final String ROOT_PATH = "/";
-    private static final String ZIP_EXTENSION = ".zip";
 
     public static Set<Path> unzip(final Path zipFile, final Path targetDir, final boolean deleteAfterUnzip) throws Exception {
         final HashSet<Path> extractedFiles = new HashSet<>();
@@ -73,11 +73,11 @@ public class ZipHandler {
                 });
             }
             if (deleteAfterUnzip) {
-                logger.log(Level.INFO, "Deleting zip file ''{0}''", zipFile);
+                LOG.debug("Deleting zip file ''{}''", zipFile);
                 Files.deleteIfExists(zipFile);
             }
         } else {
-            logger.log(Level.INFO, "No zip file ''{0}''!", zipFile);
+            LOG.debug("No zip file ''{}''!", zipFile);
             extractedFiles.add(zipFile);
         }
         return extractedFiles;
