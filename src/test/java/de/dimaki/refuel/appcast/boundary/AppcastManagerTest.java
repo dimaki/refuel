@@ -75,6 +75,7 @@ public class AppcastManagerTest {
             if (ex.getStatus() != 404) {
                 fail(ex.toString());
             }
+            System.out.println(ex);
         } catch (Exception e) {
             System.out.println("Exception was: " + e.toString());
             // OK
@@ -89,7 +90,7 @@ public class AppcastManagerTest {
                     AppcastManager.DEFAULT_CONNECT_TIMEOUT,
                     AppcastManager.DEFAULT_READ_TIMEOUT);
         } catch (AppcastException ex) {
-            // OK
+            System.out.println(ex);
         } catch (Exception e) {
             fail(e.toString());
         }
