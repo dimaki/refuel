@@ -1,33 +1,37 @@
 package de.dimaki.refuel.appcast.boundary;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.junit.Test;
 import de.dimaki.refuel.appcast.control.AppcastException;
 import de.dimaki.refuel.appcast.entity.Appcast;
 import de.dimaki.refuel.appcast.entity.Channel;
 import de.dimaki.refuel.appcast.entity.Enclosure;
 import de.dimaki.refuel.appcast.entity.Item;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import org.junit.Ignore;
+import javax.xml.bind.Unmarshaller;
+import org.junit.Test;
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 
 /**
  *
  * @author Dino Tsoumakis
  */
 public class AppcastManagerTest {
+    private static final String PROXY_HOST = "127.0.0.1";
+    private static final String PROXY_PORT = "8887";
+
 
     AppcastManager manager;
 
@@ -72,14 +76,48 @@ public class AppcastManagerTest {
                     AppcastManager.DEFAULT_CONNECT_TIMEOUT,
                     AppcastManager.DEFAULT_READ_TIMEOUT);
         } catch (AppcastException ex) {
-            if (ex.getStatus() != 404) {
-                fail(ex.toString());
-            }
-            System.out.println(ex);
+            assertEquals(404, ex.getStatus());
+            System.out.println("Status Info: " + ex.getStatusInfo());
         } catch (Exception e) {
-            System.out.println("Exception was: " + e.toString());
-            // OK
+            fail(e.toString());
         }
+    }
+
+    @Test
+    public void testFetchWithProxy() {
+        String protocolPrefix = "https.";
+
+        // Remember current settings
+        String oldProxyHost = System.getProperty(protocolPrefix + "proxyHost", null);
+        String oldProxyPort = System.getProperty(protocolPrefix + "proxyPort", null);
+
+        System.setProperty(protocolPrefix + "proxyHost", PROXY_HOST);
+        System.setProperty(protocolPrefix + "proxyPort", PROXY_PORT);
+
+        HttpProxyServer server = DefaultHttpProxyServer.bootstrap()
+                .withPort(8887)
+                .start();
+
+        try {
+            Appcast appcast = manager.fetch(new URL("https://drive.google.com/uc?export=download&id=0BxjtsbG95NcHX1VxaUpVVjFsN2M"));
+            assertNotNull(appcast);
+            System.out.println("Got latest online version: " + appcast.getLatestVersion());
+        } catch (MalformedURLException | AppcastException ex) {
+            fail("Fetching failed: " + ex.toString());
+        }
+
+        if (oldProxyHost != null && !oldProxyHost.isEmpty()) {
+            System.setProperty(protocolPrefix + "proxyHost", oldProxyHost);
+        } else {
+            System.clearProperty(protocolPrefix + "proxyHost");
+        }
+        if (oldProxyPort != null && !oldProxyPort.isEmpty()) {
+            System.setProperty(protocolPrefix + "proxyPort", oldProxyHost);
+        } else {
+            System.clearProperty(protocolPrefix + "proxyPort");
+        }
+
+        server.stop();
     }
 
     @Test
@@ -90,25 +128,25 @@ public class AppcastManagerTest {
                     AppcastManager.DEFAULT_CONNECT_TIMEOUT,
                     AppcastManager.DEFAULT_READ_TIMEOUT);
         } catch (AppcastException ex) {
-            System.out.println(ex);
+            assertEquals(403, ex.getStatus());
         } catch (Exception e) {
             fail(e.toString());
         }
     }
 
     @Test
-    @Ignore
-    public void testFetchRealHTTP() {
+    public void testFetchInvalidXml() {
         Appcast appcast = null;
         try {
-            appcast = manager.fetch(new URL("http://example.com/test/appcast.xml"),
+            appcast = manager.fetch(new URL("https://drive.google.com/uc?export=download&id=0BxjtsbG95NcHZGxJTEEwR0VTWUU"),
                     Proxy.NO_PROXY,
                     AppcastManager.DEFAULT_CONNECT_TIMEOUT,
                     AppcastManager.DEFAULT_READ_TIMEOUT);
-        } catch (AppcastException | MalformedURLException ex) {
+        } catch (AppcastException ex) {
+            assertEquals(404, ex.getStatus());
+        } catch (MalformedURLException ex) {
             fail(ex.toString());
         }
-        assertNotNull(appcast);
     }
 
     @Test

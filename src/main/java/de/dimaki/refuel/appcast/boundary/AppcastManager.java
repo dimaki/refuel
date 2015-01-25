@@ -88,7 +88,7 @@ public class AppcastManager {
             conn.connect();
             appcast = (Appcast)unmarshaller.unmarshal(conn.getInputStream());
         } catch (JAXBException jbe) {
-            throw new AppcastException("Could not read appcast from URL", url, 404, jbe.getCause().toString());
+            throw new AppcastException("Could not read appcast from URL", url, 404, jbe.toString());
         } catch (SocketTimeoutException ste) {
             throw new AppcastException("Timeout reading appcast from URL", url, 408, ste.getCause().toString());
         } catch (UnknownHostException uhe) {
