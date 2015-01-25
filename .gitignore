@@ -14,3 +14,5 @@ hs_err_pid*
 .DS_Store
 nb-configuration.xml
 nbactions.xml
+
+/lib/
