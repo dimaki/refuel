@@ -155,11 +155,9 @@ public class Updater {
         // Check if there is an update script available and execute it if so
         Map<String, Object> bindings = new HashMap<>();
         bindings.put("targetDir", targetDir);
-        for (Path filePath : files) {
-            if (filePath.getFileName().toString().endsWith(UPDATE_SCRIPT_SUFFIX)) {
-                executeUpdateScript(filePath, bindings);
-            }
-        }
+        files.stream().filter((filePath) -> (filePath.getFileName().toString().endsWith(UPDATE_SCRIPT_SUFFIX))).forEach((filePath) -> {
+            executeUpdateScript(filePath, bindings);
+        });
 
         return files;
     }
