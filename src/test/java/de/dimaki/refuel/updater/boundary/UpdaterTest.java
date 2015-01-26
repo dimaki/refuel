@@ -25,6 +25,7 @@ import de.dimaki.refuel.updater.entity.ApplicationStatus;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
+import javax.xml.bind.JAXBException;
 
 /**
  *
@@ -58,20 +59,35 @@ public class UpdaterTest {
     @Test
     public void testGetApplicationStatus() {
         try {
-        ApplicationStatus applicationStatus = updater.getApplicationStatus("2.0.1044", new URL("http://TESTURL"));
-        assertEquals(ApplicationStatus.UPDATE_AVAILABLE, applicationStatus);
-        assertEquals("2.0.4711", applicationStatus.getInfo());
-        assertNotNull(applicationStatus.getUpdateTime());
+            ApplicationStatus applicationStatus = updater.getApplicationStatus("2.0.1044", new URL("http://TESTURL"));
+            assertEquals(ApplicationStatus.UPDATE_AVAILABLE, applicationStatus);
+            assertEquals("2.0.4711", applicationStatus.getInfo());
+            assertNotNull(applicationStatus.getUpdateTime());
 
-        applicationStatus = updater.getApplicationStatus("2.0.4711", new URL("http://TESTURL"));
-        assertEquals(ApplicationStatus.OK, applicationStatus);
-        assertNotNull(applicationStatus.getUpdateTime());
+            applicationStatus = updater.getApplicationStatus("2.0.4711", new URL("http://TESTURL"));
+            assertEquals(ApplicationStatus.OK, applicationStatus);
+            assertNotNull(applicationStatus.getUpdateTime());
 
-        applicationStatus = updater.getApplicationStatus("2.2.4711", new URL("http://TESTURL"));
-        assertEquals(ApplicationStatus.UNKNOWN, applicationStatus);
-        assertNotNull(applicationStatus.getUpdateTime());
+            applicationStatus = updater.getApplicationStatus("2.2.4711", new URL("http://TESTURL"));
+            assertEquals(ApplicationStatus.UNKNOWN, applicationStatus);
+            assertNotNull(applicationStatus.getUpdateTime());
         } catch (MalformedURLException mue) {
             fail(mue.toString());
+        }
+    }
+
+    @Test
+    public void testGetApplicationStatusFailure() {
+        try {
+            Updater cut = new Updater();
+            cut.appcastManager = new AppcastManager();
+            ApplicationStatus applicationStatus = cut.getApplicationStatus("2.0.1044",
+                    new URL("http://thisisanotexistingdomainnamethatproducesanerror.com/error"));
+            assertEquals(ApplicationStatus.FAILURE, applicationStatus);
+            assertNotNull(applicationStatus.getInfo());
+            System.out.println("Got Info: " + applicationStatus.getInfo());
+        } catch (MalformedURLException | JAXBException ex) {
+            fail(ex.toString());
         }
     }
 
