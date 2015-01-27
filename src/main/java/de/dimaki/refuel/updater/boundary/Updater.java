@@ -18,9 +18,9 @@ package de.dimaki.refuel.updater.boundary;
 import de.dimaki.refuel.appcast.boundary.AppcastManager;
 import de.dimaki.refuel.appcast.control.AppcastException;
 import de.dimaki.refuel.appcast.entity.Appcast;
-import de.dimaki.refuel.updater.entity.ApplicationStatus;
 import de.dimaki.refuel.updater.control.VersionComparator;
 import de.dimaki.refuel.updater.control.ZipHandler;
+import de.dimaki.refuel.updater.entity.ApplicationStatus;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -113,7 +113,8 @@ public class Updater {
                     } catch (Exception ex) {
                         // Seems the be a network problem (e.g. no internet connection)
                         // Just log it, status should be unknown
-                        LOG.warn("Could not connect to update server: {}", ex.toString());
+                        status.setInfo(ex.getMessage());
+                        LOG.warn("Could not connect to update server: {}", ex.getMessage());
                     }
                     status.setUpdateTime(new Date());
                 }
