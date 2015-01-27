@@ -31,9 +31,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://dimaki@github.com/dimaki/refuel.git</connection>
-        <developerConnection>scm:git:https://dimaki@github.com/dimaki/refuel.git</developerConnection>
-        <url>https://github.com/dimaki/refuel</url>
+        <connection>scm:git:git@github.com:dimaki/refuel.git</connection>
+        <developerConnection>scm:git:git@github.com:dimaki/refuel.git</developerConnection>
+        <url>scm:git:git@github.com:dimaki/refuel</url>
         <tag>0.0.4</tag>
     </scm>
     <developers>
