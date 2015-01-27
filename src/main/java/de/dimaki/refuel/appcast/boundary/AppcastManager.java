@@ -88,11 +88,11 @@ public class AppcastManager {
             conn.connect();
             appcast = (Appcast)unmarshaller.unmarshal(conn.getInputStream());
         } catch (JAXBException jbe) {
-            throw new AppcastException("Could not read appcast from URL", url, 404, jbe.toString());
+            throw new AppcastException("Could not read appcast from URL", url, 404, jbe.getMessage());
         } catch (SocketTimeoutException ste) {
-            throw new AppcastException("Timeout reading appcast from URL", url, 408, ste.getCause().toString());
+            throw new AppcastException("Timeout reading appcast from URL", url, 408, (ste.getCause() != null) ? ste.getCause().getMessage() : ste.getMessage());
         } catch (UnknownHostException uhe) {
-            throw new AppcastException("Unknown Host", url, 404, uhe.toString());
+            throw new AppcastException("Unknown Host", url, 404, uhe.getMessage());
         } catch (IOException ex) {
             throw new AppcastException("Could not establish connection to URL", url, 403, ex.getMessage());
         }
