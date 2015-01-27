@@ -32,7 +32,6 @@ public class AppcastManagerTest {
     private static final String PROXY_HOST = "127.0.0.1";
     private static final String PROXY_PORT = "8887";
 
-
     AppcastManager manager;
 
     public AppcastManagerTest() throws JAXBException {
