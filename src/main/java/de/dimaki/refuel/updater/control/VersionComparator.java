@@ -23,12 +23,38 @@ import java.util.Comparator;
  */
 public class VersionComparator implements Comparator<String> {
 
-    public static final String VERSION_SEPARATOR = "\\.";
+    private static final String VERSION_SEPARATOR = "\\.";
+    private static final String QUALIFIER_SEPARATOR = "-";
+    private static final String SNAPSHOT_VERSION = "snapshot";
 
     @Override
     public int compare(String localVersion, String remoteVersion) {
-        String[] p1 = localVersion.split(VERSION_SEPARATOR);
-        String[] p2 = remoteVersion.split(VERSION_SEPARATOR);
+
+        String local = null;
+        String qualifierLocal = null;
+        String remote = null;
+        String qualifierRemote = null;
+
+
+        int qualifierIndexLocal = localVersion.indexOf(QUALIFIER_SEPARATOR);
+        int qualifierIndexRemote = remoteVersion.indexOf(QUALIFIER_SEPARATOR);
+
+        if (qualifierIndexLocal > 0) {
+            qualifierLocal = localVersion.substring( qualifierIndexLocal + 1 );
+            local = localVersion.substring(0, qualifierIndexLocal);
+        } else {
+            local = localVersion;
+        }
+
+        if (qualifierIndexRemote > 0) {
+            qualifierRemote = remoteVersion.substring(qualifierIndexRemote + 1);
+            remote = remoteVersion.substring(0, qualifierIndexRemote);
+        } else {
+            remote = remoteVersion;
+        }
+
+        String[] p1 = local.split(VERSION_SEPARATOR);
+        String[] p2 = remote.split(VERSION_SEPARATOR);
 
         int n = Math.min(p1.length, p2.length);
         for (int i = 0; i < n; i++) {
@@ -42,6 +68,27 @@ public class VersionComparator implements Comparator<String> {
                 }
             } catch (NumberFormatException nfe) {
                 // Handle NaN errors
+            }
+        }
+
+        // different length
+        if (Math.max(p1.length, p2.length) > n) {
+            if (p1.length > p2.length) {
+                return 1;
+            } else if (p1.length < p2.length) {
+                return -1;
+            }
+        }
+
+        if (qualifierLocal != null) {
+            if (qualifierRemote == null || qualifierRemote.isEmpty()) {
+                // Version without qualifiers always win
+                return -1;
+            }
+        } else {
+            if (qualifierRemote != null) {
+                // Versions without qualifiery always win
+                return 1;
             }
         }
 
