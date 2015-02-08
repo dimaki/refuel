@@ -25,7 +25,6 @@ public class VersionComparator implements Comparator<String> {
 
     private static final String VERSION_SEPARATOR = "\\.";
     private static final String QUALIFIER_SEPARATOR = "-";
-    private static final String SNAPSHOT_VERSION = "snapshot";
 
     @Override
     public int compare(String localVersion, String remoteVersion) {
