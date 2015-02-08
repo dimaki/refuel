@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.dimaki</groupId>
     <artifactId>refuel</artifactId>
-    <version>0.0.5-SNAPSHOT</version>
+    <version>0.0.5</version>
     <packaging>jar</packaging>
     
     <name>Refuel</name>
@@ -34,7 +34,7 @@
         <connection>scm:git:git@github.com:dimaki/refuel.git</connection>
         <developerConnection>scm:git:git@github.com:dimaki/refuel.git</developerConnection>
         <url>scm:git:git@github.com:dimaki/refuel.git</url>
-        <tag>0.0.4</tag>
+        <tag>0.0.5</tag>
     </scm>
     <developers>
         <developer>
