@@ -64,6 +64,11 @@ public class VersionComparatorTest {
         remoteVersion = "2.1.1";
         compare = vc.compare(localVersion, remoteVersion);
         assertTrue(localVersion + " < " + remoteVersion, compare < 0);
+
+        remoteVersion = "2.0.2.4711";
+        localVersion = "2.0.2-SNAPSHOT";
+        compare = vc.compare(localVersion, remoteVersion);
+        assertTrue(localVersion + " < " + remoteVersion, compare < 0);
     }
 
     @Test
@@ -84,6 +89,16 @@ public class VersionComparatorTest {
         remoteVersion = "2.0.4711-SNAPSHOT";
         compare = vc.compare(localVersion, remoteVersion);
         assertEquals(localVersion + " > " + remoteVersion, 1, compare);
+
+        remoteVersion = "2.0.2.4711";
+        localVersion = "2.0.3-SNAPSHOT";
+        compare = vc.compare(localVersion, remoteVersion);
+        assertEquals(localVersion + " > " + remoteVersion, 1, compare);
+
+        remoteVersion = "2.0.2-SNAPSHOT";
+        localVersion = "2.0.2.4711";
+        compare = vc.compare(localVersion, remoteVersion);
+        assertEquals(localVersion + " > " + remoteVersion, 1, compare);
     }
 
     @Test
@@ -91,6 +106,11 @@ public class VersionComparatorTest {
         String localVersion = "2.0.4711";
         String remoteVersion = "2.0.4711";
         int compare = vc.compare(localVersion, remoteVersion);
+        assertEquals(localVersion + " == " + remoteVersion, 0, compare);
+
+        localVersion = "2.0.3.4711";
+        remoteVersion = "2.0.3.4711";
+        compare = vc.compare(localVersion, remoteVersion);
         assertEquals(localVersion + " == " + remoteVersion, 0, compare);
     }
 

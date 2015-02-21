@@ -206,6 +206,13 @@ public class AppcastManagerTest {
         }
     }
 
+    @Test
+    public void testGetLatestVersion() {
+        Appcast appcast = getAppcast();
+        String latestVersion = appcast.getLatestVersion();
+        System.out.println("Latest Version: " + latestVersion);
+    }
+
     public Appcast getAppcast() {
         Appcast appcast = null;
         try {
