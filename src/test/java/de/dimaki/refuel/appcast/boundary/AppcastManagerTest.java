@@ -16,7 +16,9 @@ import java.net.Proxy;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -138,10 +140,14 @@ public class AppcastManagerTest {
     public void testFetchInvalidXml() {
         Appcast appcast = null;
         try {
+            Map<String, String> requestProperties = new HashMap<>();
+            requestProperties.put("User-Agent", "Refuel-Client");
+            requestProperties.put("SampleProperty", "SampleValue");
             appcast = manager.fetch(new URL("https://drive.google.com/uc?export=download&id=0BxjtsbG95NcHZGxJTEEwR0VTWUU"),
                     Proxy.NO_PROXY,
                     AppcastManager.DEFAULT_CONNECT_TIMEOUT,
-                    AppcastManager.DEFAULT_READ_TIMEOUT);
+                    AppcastManager.DEFAULT_READ_TIMEOUT,
+                    requestProperties);
         } catch (AppcastException ex) {
             assertEquals(404, ex.getStatus());
         } catch (MalformedURLException ex) {

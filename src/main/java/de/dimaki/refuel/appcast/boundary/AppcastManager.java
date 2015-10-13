@@ -31,6 +31,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -75,13 +76,33 @@ public class AppcastManager {
      * @throws AppcastException in case of an error
      */
     public Appcast fetch(final URL url, Proxy proxy, int connectTimeout, int readTimeout) throws AppcastException {
+        return fetch(url, proxy, connectTimeout, readTimeout, null);
+    }
+
+    /**
+     * Fetch an appcast from the given URL
+     *
+     * @param url The update URL
+     * @param proxy proxy data
+     * @param connectTimeout the connect timeout in milliseconds
+     * @param readTimeout the read timeout in milliseconds
+     * @param requestProperties optional request properties
+     * @return The fetched appcast content
+     * @throws AppcastException in case of an error
+     */
+    public Appcast fetch(final URL url, Proxy proxy, int connectTimeout, int readTimeout, Map<String, String> requestProperties) throws AppcastException {
         Appcast appcast = null;
-        URLConnection conn = null;
         try {
+            URLConnection conn;
             if (proxy == null) {
                 conn = url.openConnection();
             } else {
                 conn = url.openConnection(proxy);
+            }
+            if (requestProperties != null) {
+                requestProperties.forEach((k,v) -> {
+                    conn.setRequestProperty(k, v);
+                });
             }
             conn.setConnectTimeout(connectTimeout);
             conn.setReadTimeout(readTimeout);

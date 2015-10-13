@@ -37,6 +37,11 @@ public class Enclosure {
     String shortVersionString;
     @XmlAttribute(namespace="http://www.andymatuschak.org/xml-namespaces/sparkle")
     String dsaSignature;
+    @XmlAttribute(namespace="http://www.andymatuschak.org/xml-namespaces/sparkle")
+    String md5;
+    @XmlAttribute(namespace="http://www.andymatuschak.org/xml-namespaces/sparkle")
+    String sha1;
+
 
     public String getUrl() {
         return url;
@@ -86,5 +91,19 @@ public class Enclosure {
         this.dsaSignature = dsaSignature;
     }
 
+    public String getMd5() {
+        return md5;
+    }
 
+    public void setMd5(String md5) {
+        this.md5 = md5;
+    }
+
+    public String getSha1() {
+        return sha1;
+    }
+
+    public void setSha1(String sha1) {
+        this.sha1 = sha1;
+    }
 }
