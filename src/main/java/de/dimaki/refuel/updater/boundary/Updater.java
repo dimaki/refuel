@@ -100,10 +100,13 @@ public class Updater {
                             int compare = vc.compare(localVersion, remoteVersion);
                             if (compare == 0) {
                                 status = ApplicationStatus.OK;
-                            } else if (compare == -1) {
+                                status.setInfo("No update available");
+                            } else if (compare < 0) {
                                 status = ApplicationStatus.UPDATE_AVAILABLE;
                                 status.setInfo(remoteVersion);
                                 status.setAppcast(appcast);
+                            } else if (compare > 0) {
+                                status = ApplicationStatus.OK;
                             }
                         }
                     } catch (AppcastException aex) {

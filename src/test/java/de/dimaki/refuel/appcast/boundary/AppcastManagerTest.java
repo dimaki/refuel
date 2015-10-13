@@ -34,7 +34,6 @@ public class AppcastManagerTest {
     private static final String PROXY_HOST = "127.0.0.1";
     private static final String PROXY_PORT = "8887";
 
-
     AppcastManager manager;
 
     public AppcastManagerTest() throws JAXBException {
@@ -211,6 +210,13 @@ public class AppcastManagerTest {
             } catch (IOException iOException) {
             }
         }
+    }
+
+    @Test
+    public void testGetLatestVersion() {
+        Appcast appcast = getAppcast();
+        String latestVersion = appcast.getLatestVersion();
+        System.out.println("Latest Version: " + latestVersion);
     }
 
     public Appcast getAppcast() {

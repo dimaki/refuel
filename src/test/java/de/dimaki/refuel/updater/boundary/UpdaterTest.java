@@ -69,7 +69,7 @@ public class UpdaterTest {
             assertNotNull(applicationStatus.getUpdateTime());
 
             applicationStatus = updater.getApplicationStatus("2.2.4711", new URL("http://TESTURL"));
-            assertEquals(ApplicationStatus.UNKNOWN, applicationStatus);
+            assertEquals(ApplicationStatus.OK, applicationStatus);
             assertNotNull(applicationStatus.getUpdateTime());
         } catch (MalformedURLException mue) {
             fail(mue.toString());
