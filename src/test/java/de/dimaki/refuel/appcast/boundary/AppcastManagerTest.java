@@ -129,7 +129,7 @@ public class AppcastManagerTest {
                     AppcastManager.DEFAULT_CONNECT_TIMEOUT,
                     AppcastManager.DEFAULT_READ_TIMEOUT);
         } catch (AppcastException ex) {
-            assertEquals(403, ex.getStatus());
+            assertEquals(404, ex.getStatus());
         } catch (Exception e) {
             fail(e.toString());
         }
