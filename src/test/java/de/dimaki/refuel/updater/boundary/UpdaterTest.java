@@ -93,6 +93,36 @@ public class UpdaterTest {
     }
 
     @Test
+    public void testGetApplicationStatusShortVersionString() {
+        try {
+            AppcastManager appcastManagerMock = mock(AppcastManager.class);
+            Appcast appcast = new Appcast();
+            Channel c = new Channel();
+            Item i = new Item();
+            Enclosure e = new Enclosure();
+            e.setVersion("4711");
+            e.setShortVersionString("2.2.0");
+            i.setEnclosure(e);
+            List<Item> items = new ArrayList<>();
+            items.add(i);
+            c.setItems(items);
+            appcast.setChannel(c);
+
+            when(appcastManagerMock.fetch(any(URL.class), any(Proxy.class), anyInt(), anyInt(), any(Map.class))).thenReturn(appcast);
+            when(appcastManagerMock.getLatestVersion(any(URL.class), any(Proxy.class), anyInt(), anyInt())).thenReturn("4711");
+            when(appcastManagerMock.download(any(Appcast.class), any(Path.class))).thenCallRealMethod();
+            updater.appcastManager = appcastManagerMock;
+
+            ApplicationStatus applicationStatus = updater.getApplicationStatus("4710", new URL("http://TESTURL"));
+            assertEquals(ApplicationStatus.UPDATE_AVAILABLE.name(), applicationStatus.name());
+            assertEquals("2.2.0", applicationStatus.getInfo());
+            assertNotNull(applicationStatus.getUpdateTime());
+        } catch (Exception exception) {
+            fail("Could not update: " + exception.toString());
+        }
+    }
+
+    @Test
     public void testUpdate() throws Exception {
         try {
             AppcastManagerTest test = new AppcastManagerTest();

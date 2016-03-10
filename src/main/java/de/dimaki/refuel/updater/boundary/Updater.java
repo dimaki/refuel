@@ -119,7 +119,12 @@ public class Updater {
                                 status.setInfo("No update available");
                             } else if (compare < 0) {
                                 status = ApplicationStatus.UPDATE_AVAILABLE;
-                                status.setInfo(remoteVersion);
+                                String shortVersionString = appcast.getLatestEnclosure().getShortVersionString();
+                                if (shortVersionString != null && !shortVersionString.isEmpty()) {
+                                    status.setInfo(shortVersionString);
+                                } else {
+                                    status.setInfo(remoteVersion);
+                                }
                                 status.setAppcast(appcast);
                             } else if (compare > 0) {
                                 status = ApplicationStatus.OK;
