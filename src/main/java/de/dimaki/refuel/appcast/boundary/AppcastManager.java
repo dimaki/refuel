@@ -19,6 +19,7 @@ import de.dimaki.refuel.appcast.control.AppcastException;
 import de.dimaki.refuel.appcast.entity.Appcast;
 import de.dimaki.refuel.appcast.entity.Enclosure;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Proxy;
@@ -32,8 +33,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -88,9 +91,24 @@ public class AppcastManager {
      * @throws AppcastException in case of an error
      */
     public Appcast fetch(final URL url, Proxy proxy, int connectTimeout, int readTimeout) throws AppcastException {
+        return fetch(url, proxy, connectTimeout, readTimeout, null);
+    }
+
+    /**
+     * Fetch an appcast from the given URL
+     *
+     * @param url The update URL
+     * @param proxy proxy data
+     * @param connectTimeout the connect timeout in milliseconds
+     * @param readTimeout the read timeout in milliseconds
+     * @param requestProperties optional request properties
+     * @return The fetched appcast content
+     * @throws AppcastException in case of an error
+     */
+    public Appcast fetch(final URL url, Proxy proxy, int connectTimeout, int readTimeout, Map<String, String> requestProperties) throws AppcastException {
         Appcast appcast = null;
-        URLConnection conn = null;
         try {
+            URLConnection conn;
             if (proxy == null) {
                 conn = url.openConnection();
             } else {
@@ -111,8 +129,18 @@ public class AppcastManager {
                 }
                 conn = httpsConn;
             }
-            conn.connect();
-            appcast = (Appcast)unmarshaller.unmarshal(conn.getInputStream());
+
+            final URLConnection connection = conn;
+
+            // Add request properties
+            if (requestProperties != null) {
+                requestProperties.forEach((k,v) -> {
+                    connection.setRequestProperty(k, v);
+                });
+            }
+
+            connection.connect();
+            appcast = (Appcast)unmarshaller.unmarshal(connection.getInputStream());
         } catch (JAXBException jbe) {
             throw new AppcastException("Could not read appcast from URL", url, 404, jbe.getMessage());
         } catch (SocketTimeoutException ste) {
@@ -194,8 +222,23 @@ public class AppcastManager {
                         }
                     }
 
-                    // Check DSA Signature
-                    // TODO
+                    // Check MD5/DSA Signature
+                    String md5 = enclosure.getMd5();
+                    if (md5 != null) {
+                        MessageDigest md = MessageDigest.getInstance("MD5");
+                        md.reset();
+                        byte[] bytes = new byte[2048];
+                        int numBytes;
+                        try (FileInputStream is = new FileInputStream(tmpFile)) {
+                            while ((numBytes = is.read(bytes)) != -1) {
+                                md.update(bytes, 0, numBytes);
+                            }
+                        }
+                        String hash = toHex(md.digest());
+                        if (!md5.equalsIgnoreCase(hash)) {
+                            throw new Exception("Downloaded file has wrong MD5 hash! Expected: " + md5 + " -- Actual: " + hash);
+                        }
+                    }
 
                     // Copy file to target dir
                     downloaded = Files.copy(tmpFile.toPath(), targetDir.resolve(targetName), StandardCopyOption.REPLACE_EXISTING);
@@ -210,6 +253,15 @@ public class AppcastManager {
         }
 
         return downloaded;
+    }
+
+    private static String toHex(byte[] arrayBytes) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < arrayBytes.length; i++) {
+            sb.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16)
+                    .substring(1));
+        }
+        return sb.toString();
     }
 
     public boolean isTrustAllCerts() {

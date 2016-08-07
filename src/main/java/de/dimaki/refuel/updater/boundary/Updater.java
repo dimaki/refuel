@@ -80,6 +80,22 @@ public class Updater {
      * @return The application status or 'null' if the status could not be evaluated
      */
     public ApplicationStatus getApplicationStatus(String localVersion, final URL updateUrl, Proxy proxy, int connectTimeout, int readTimeout) {
+        return getApplicationStatus(localVersion, updateUrl, proxy, connectTimeout, readTimeout, null);
+    }
+
+    /**
+     * Get the update status of the application specified.
+     *
+     * @param localVersion The local version string, e.g. "2.0.1344"
+     * @param updateUrl The update URL (Appcast URL)
+     * @param proxy Proxy data
+     * @param connectTimeout The connect timeout in milliseconds
+     * @param readTimeout The read timeout in milliseconds
+     * @param requestProperties Optional request properties
+     * @return The application status or 'null' if the status could not be evaluated
+     */
+    public ApplicationStatus getApplicationStatus(String localVersion, final URL updateUrl, Proxy proxy, int connectTimeout, int readTimeout,
+            Map<String, String> requestProperties) {
         ApplicationStatus status = ApplicationStatus.UNKNOWN;
         if (localVersion != null) {
             if (!localVersion.isEmpty()) {
@@ -88,7 +104,7 @@ public class Updater {
                     String remoteVersion = null;
                     try {
                         LOG.debug("Fetching appcast from update URL ''{}''...", updateUrl);
-                        Appcast appcast = appcastManager.fetch(updateUrl, proxy, connectTimeout, readTimeout);
+                        Appcast appcast = appcastManager.fetch(updateUrl, proxy, connectTimeout, readTimeout, requestProperties);
                         if (appcast != null) {
                             remoteVersion = appcast.getLatestVersion();
                         }
@@ -103,7 +119,12 @@ public class Updater {
                                 status.setInfo("No update available");
                             } else if (compare < 0) {
                                 status = ApplicationStatus.UPDATE_AVAILABLE;
-                                status.setInfo(remoteVersion);
+                                String shortVersionString = appcast.getLatestEnclosure().getShortVersionString();
+                                if (shortVersionString != null && !shortVersionString.isEmpty()) {
+                                    status.setInfo(shortVersionString);
+                                } else {
+                                    status.setInfo(remoteVersion);
+                                }
                                 status.setAppcast(appcast);
                             } else if (compare > 0) {
                                 status = ApplicationStatus.OK;
