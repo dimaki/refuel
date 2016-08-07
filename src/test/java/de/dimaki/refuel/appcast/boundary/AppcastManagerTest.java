@@ -20,6 +20,7 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
@@ -120,9 +121,10 @@ public class AppcastManagerTest {
     }
 
     @Test
+    @Ignore
     public void testFetchError() {
         try {
-            manager.fetch(new URL("http://dummy.com"),
+            manager.fetch(new URL("http://httpstat.us/403"),
                     Proxy.NO_PROXY,
                     AppcastManager.DEFAULT_CONNECT_TIMEOUT,
                     AppcastManager.DEFAULT_READ_TIMEOUT);

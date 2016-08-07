@@ -31,6 +31,15 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -47,6 +56,10 @@ public class AppcastManager {
 
     //Client client;
     Unmarshaller unmarshaller;
+    // Trust all certs
+    boolean trustAllCerts = false;
+    // Verify Hostname
+    boolean verifyHostname = true;
 
     public AppcastManager() throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(Appcast.class);
@@ -85,6 +98,19 @@ public class AppcastManager {
             }
             conn.setConnectTimeout(connectTimeout);
             conn.setReadTimeout(readTimeout);
+
+            // init SSL
+            if ((trustAllCerts || !verifyHostname) && conn instanceof HttpsURLConnection) {
+                HttpsURLConnection httpsConn = (HttpsURLConnection)conn;
+                if (trustAllCerts) {
+                    SSLContext sslContext = createSslContext();
+                    httpsConn.setSSLSocketFactory(sslContext.getSocketFactory());
+                }
+                if (!verifyHostname) {
+                    httpsConn.setHostnameVerifier(new TrustAllHostnameVerifier());
+                }
+                conn = httpsConn;
+            }
             conn.connect();
             appcast = (Appcast)unmarshaller.unmarshal(conn.getInputStream());
         } catch (JAXBException jbe) {
@@ -95,6 +121,8 @@ public class AppcastManager {
             throw new AppcastException("Unknown Host", url, 404, uhe.getMessage());
         } catch (IOException ex) {
             throw new AppcastException("Could not establish connection to URL", url, 403, ex.getMessage());
+        } catch (GeneralSecurityException ex) {
+            throw new AppcastException("Could not initialize SSL context", url, 500, ex.getMessage());
         }
         // Got a valid response
         return appcast;
@@ -182,5 +210,59 @@ public class AppcastManager {
         }
 
         return downloaded;
+    }
+
+    public boolean isTrustAllCerts() {
+        return trustAllCerts;
+    }
+
+    /**
+     * Set option to trust all SSL certificates
+     * @param trustAllCerts true to trust all SSL certificates, false otherwise (default)
+     */
+    public void setTrustAllCerts(boolean trustAllCerts) {
+        this.trustAllCerts = trustAllCerts;
+    }
+
+    public boolean isVerifyHostname() {
+        return verifyHostname;
+    }
+
+    /**
+     * Set option to verify hostname
+     * @param verifyHostname true to verify hostnames in SSL sessions (default), false to disable hostname verification
+     */
+    public void setVerifyHostname(boolean verifyHostname) {
+        this.verifyHostname = verifyHostname;
+    }
+
+    private SSLContext createSslContext() throws GeneralSecurityException {
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+
+        TrustManager[] trustAll = new TrustManager[] {new X509TrustManager() {
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+                @Override
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                }
+                @Override
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                }
+            }
+        };
+        sslContext.init(null, trustAll, new SecureRandom());
+        return sslContext;
+    }
+
+    /**
+     * Inner class to trust all hostnames
+     */
+    public class TrustAllHostnameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
     }
 }
