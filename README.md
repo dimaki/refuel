@@ -1,9 +1,8 @@
-[![Build Status](https://drone.io/github.com/dimaki/refuel/status.png)](https://drone.io/github.com/dimaki/refuel/latest)
-
 refuel
 ======
 
-**A simple update framework for Java 8**
+**A simple update framework for Java**
+(requires Java 8)
 
 refuel is available from maven central:
 ```xml
@@ -39,7 +38,7 @@ Example:
 			</description>
             <pubDate>Tue, 02 Oct 2013 15:20:11 +0100</pubDate>
             <sparkle:releaseNotesLink>https://www.someurl.xyz/release_notes.html</sparkle:releaseNotesLink>
-            <enclosure url="https://www.someurl.xyz/test.zip" sparkle:version="2.0.4711" length="1505" type="application/octet-stream" />
+            <enclosure url="https://www.someurl.xyz/test.zip" sparkle:version="2.0.4711" length="1505" type="application/octet-stream" sparkle:md5="ae14a99c788cff24a9548907d1c73220" />
          </item>
    </channel>
 </rss>
