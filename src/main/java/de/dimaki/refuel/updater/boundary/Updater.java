@@ -108,7 +108,7 @@ public class Updater {
                         if (appcast != null) {
                             remoteVersion = appcast.getLatestVersion();
                         }
-                        if (remoteVersion == null) {
+                        if (appcast == null || remoteVersion == null) {
                             status = ApplicationStatus.FAILURE;
                             status.setInfo("No version information found");
                         } else {
@@ -119,7 +119,7 @@ public class Updater {
                                 status.setInfo("No update available");
                             } else if (compare < 0) {
                                 status = ApplicationStatus.UPDATE_AVAILABLE;
-                                String shortVersionString = appcast.getLatestEnclosure().getShortVersionString();
+                            String shortVersionString = appcast.getLatestEnclosure().getShortVersionString();
                                 if (shortVersionString != null && !shortVersionString.isEmpty()) {
                                     status.setInfo(shortVersionString);
                                 } else {
