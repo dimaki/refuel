@@ -15,4 +15,7 @@ hs_err_pid*
 nb-configuration.xml
 nbactions.xml
 
+.idea/
+*.iml
+
 /lib/
